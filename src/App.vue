@@ -1,26 +1,99 @@
+<!-- App.vue -->
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <MonthListComponent  class="months"/>
+    <CalendarComponent class="grid" :events="events"/>
+    <EventsListComponent class="events" :events="events"/>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import CalendarComponent from './components/CalendarComponent.vue';
+import EventsListComponent from './components/EventsListComponent.vue';
+import MonthListComponent from './components/MonthListComponent.vue';
+import { ref, onMounted } from 'vue';
+
+
+/*
+    const toFormatedDate = function(date) {
+          const datetime = date.toString()
+              .replace(/^.{3}\s|\s?GMT.+/ig, '');
+
+          const [ month, dom, year, time ] = datetime.split(' ');
+          const [ hours, minutes ] = time.split(':');
+
+          return  month + ' ' + (+dom) + ',' + year + ' ' +
+              (+hours + ':'+ minutes + (+hours < 12 ? 'AM' : 'PM'))
+    };
+*/
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    CalendarComponent,
+    MonthListComponent,
+    EventsListComponent
+  },
+  setup() {
+    const events = ref([]);
+    const fetchCalendarEvents = async function(calendarId, apiKey) {
+      const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}`;
+    
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
+        const data = await response.json();
+        return data.items.map(event => ({
+          ...event,
+          start: event.start.dateTime || event.start.date,
+          end: event.end.dateTime || event.end.date,
+          title: event.summary,
+          content: event.description,
+          id: event.id
+        }));
+      } catch (error) {
+        console.error(error);
+        return [];
+      }
+    }
+
+    onMounted(async () => {
+      events.value = await fetchCalendarEvents('9188d3a61627dc646487e8a9e8a02541f4fca90eebdf0f0bf162bd0a23d45edf@group.calendar.google.com', 'AIzaSyD1SAN0kf3Ou-SCDCbsiPEPsj8G4rGWIo0');
+      console.log(events.value);
+
+    });
+
+    return { events };
   }
-}
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
+/* Add any additional styling here if needed */
+* {
+  font: 15px Avenir,Helvetica,Arial,sans-serif;
+    font-size: 15px;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  /* color: #2c3e50; */
+}
+html, body, #app {
+  width:100%;
+  height: 100%;
+  margin: 0;
+}
+#app {
+  display: flex;
+}
+.months {
+  min-width: 240px
+}
+.grid{
+  padding: 60px 32px;
+  box-shadow: 16px 0px 32px -10px #c0c0c0;
+  flex-grow: 3;
+}
+.events {
+  max-width: 500px;
+  flex-grow: 1;
 }
 </style>

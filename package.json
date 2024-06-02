@@ -9,7 +9,12 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "googleapis": "^137.1.0",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5",
+    "vue": "^3.4.27",
+    "vue-cal": "^4.8.1",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
