@@ -18,8 +18,8 @@
                 >
                 
                     
-                    <template #cell-content="{ cell, view }">
-                    <div class="vuecal__cell-date" :class="[view.id, getCellClass(cell, view)]" v-if="view.id === 'month'">
+                    <template #cell-content="{ cell, view, events }">
+                    <div class="vuecal__cell-date" :class="[view.id, getCellClass(cell, view, events)]" v-if="view.id === 'month'">
                         {{ cell.content }}
                     </div>
                 </template> 
@@ -42,8 +42,10 @@ export default {
         }
     },
     setup() {
-        // cell, view
-        const getCellClass = () => {
+        // 
+        const getCellClass = (cell, view, events) => {
+            console.log('\ncell: ', cell, '\nview: \n', view, '\n:events: \n', events)
+
             return '';
         };
 
@@ -87,7 +89,11 @@ export default {
     width: 100%;
     height: 100%;
 }
-.vuecal__arrow  {
+.vuecal__title-bar{
+    background-color: rgba(244, 211, 102, 0.73);
+    border-radius: 999px;
+}
+/* .vuecal__arrow  {
     display: none;
 }
 .vuecal__title * {
@@ -133,7 +139,7 @@ export default {
 }
 .vuecal__cell--has-events  .vuecal__cell-content {
     color: #fff;
-}
+} */
 /* .vuecal__title-bar {background-color: #e4f5ef;}
 .vuecal__cell--today, .vuecal__cell--current {background-color: rgba(240, 240, 255, 0.4);}
 .vuecal:not(.vuecal--day-view) .vuecal__cell--selected {background-color: rgba(235, 255, 245, 0.4);}

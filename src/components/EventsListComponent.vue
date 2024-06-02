@@ -1,43 +1,109 @@
 
 <template>
-    <div class="list">
-        <div class="timeline">
-            <div class="timeline-item" v-for="(event, index) in events" :key="index">
-                <div class="timeline-marker"></div>
-                <div class="timeline-content">
-                    <h3>{{ event.start }}</h3>
-                    <p>{{ event.summary }}</p>
+    <div class="container">
+  
+            <div class="header">
+                <div>
+                    <h5 class="subtitle past">PAST</h5>
+                    <h5 class="subtitle future">FUTURE</h5>
+                </div>
+                <h1 class="title">EVENTS</h1>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item" v-for="(event, index) in events2" :key="index">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3>{{ event.start }}</h3>
+                        <p>{{ event.summary }}</p>
+                    </div>
                 </div>
             </div>
-        </div>
+   
     </div>
 </template>
 
   
 <script>  
-  export default {
-    components: {  },
-    props: {
-        events: {
-            type: Array,
-            required: true
-        }
-    },
-
-    data() {
-      return {};
+ export default {
+  components: {},
+  props: {
+    events: {
+      type: Array,
+      required: true
     }
-  };
+  },
+  data() {
+    return {
+      comingNextEvent: null,
+      lastStagedEvent: null,
+      events2: []
+    };
+  },
+  watch: {
+    // Watch for changes in the events prop
+    events: {
+      handler(events) {
+        this.events2 = events.reverse()
+            .map(event => ({ 
+                ...event, 
+                start: this.toFormatedDate(event.start), 
+                end: this.toFormatedDate(event.end) 
+            }))
+        // console.log('WATCHING EVENTS',events, this.comingNextEvent, this.lastStagedEvent);
+      },
+      immediate: true // Call the handler immediately with the current value of events
+    }
+  },
+  methods: {
+    toFormatedDate: function(date) {
+          const datetime = date.toString()
+              .replace(/^.{3}\s|\s?GMT.+/ig, '');
+
+          const [ month, dom, year, time ] = datetime.split(' ');
+          const [ hours, minutes ] = time.split(':');
+
+          return  month + ' ' + (+dom) + ',' + year + ' ' +
+              (+hours + ':'+ minutes + (+hours < 12 ? 'AM' : 'PM'))
+    }
+  }
+};
+
 </script>
   
 <style scoped>
-.list {
-    padding: 80px 36px;
-    overflow: scroll
+.container {
+    max-width: 500px;
+    flex-grow: 1;
+    overflow: scroll;
+}
+.header {
+    /* position: sticky;
+    top: 0; */
+    display: flex;
+    align-items: center;
+    padding: 16px 32px;
+    background-color: #fff;
+    z-index: 1;
+}
+.header .title{
+    font-size: 5rem;
+    margin: 0;
+    color: #36454F;
+}
+.header .subtitle {
+    text-align: right;
+    margin: 0 16px 0 0;
+    font-size: 1.5rem;
+}
+.header .past{
+    color: #ea2a9f;
+}
+.header .future {
+    color: #06b506;
 }
 .timeline {
     position: relative;
-    margin: 20px;
+    margin: 16px 16px 32px 64px;
     padding: 20px 0;
     list-style: none;
 }

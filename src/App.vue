@@ -13,16 +13,7 @@ import { ref, onMounted } from 'vue';
 
 
 /*
-    const toFormatedDate = function(date) {
-          const datetime = date.toString()
-              .replace(/^.{3}\s|\s?GMT.+/ig, '');
 
-          const [ month, dom, year, time ] = datetime.split(' ');
-          const [ hours, minutes ] = time.split(':');
-
-          return  month + ' ' + (+dom) + ',' + year + ' ' +
-              (+hours + ':'+ minutes + (+hours < 12 ? 'AM' : 'PM'))
-    };
 */
 
 export default {
@@ -33,6 +24,8 @@ export default {
     EventsListComponent
   },
   setup() {
+    // const gridViewEvents = ref([]);
+    // const listViewEvents = ref([]);
     const events = ref([]);
     const fetchCalendarEvents = async function(calendarId, apiKey) {
       const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}`;
@@ -42,25 +35,38 @@ export default {
         if (!response.ok) {
           throw new Error('Failed to fetch events');
         }
+
         const data = await response.json();
-        return data.items.map(event => ({
-          ...event,
-          start: event.start.dateTime || event.start.date,
-          end: event.end.dateTime || event.end.date,
-          title: event.summary,
-          content: event.description,
-          id: event.id
-        }));
+        return data.items;
       } catch (error) {
-        console.error(error);
         return [];
       }
     }
 
     onMounted(async () => {
-      events.value = await fetchCalendarEvents('9188d3a61627dc646487e8a9e8a02541f4fca90eebdf0f0bf162bd0a23d45edf@group.calendar.google.com', 'AIzaSyD1SAN0kf3Ou-SCDCbsiPEPsj8G4rGWIo0');
-      console.log(events.value);
+      events.value = (await fetchCalendarEvents(
+        '9188d3a61627dc646487e8a9e8a02541f4fca90eebdf0f0bf162bd0a23d45edf@group.calendar.google.com', 
+        'AIzaSyD1SAN0kf3Ou-SCDCbsiPEPsj8G4rGWIo0')
+      )
+      .map(event => ({
+          title: event.summary,
+          start: event.start.dateTime || event.start.date,
+          end: event.end.dateTime || event.end.date,
+          summary: event.summary,
+          id: event.id,
+          class: 'SOME_CLASS'
+      }))
+      .map(event => ({
+          ...event,
+          start: Date.parse(event.start) 
+            ? new Date(event.start) 
+            : event.start,
+          end: Date.parse(event.end) 
+            ? new Date(event.end) 
+            : event.end
+      }));
 
+      // console.log(gridViewEvents, listViewEvents);
     });
 
     return { events };
@@ -91,6 +97,7 @@ html, body, #app {
   padding: 60px 32px;
   box-shadow: 16px 0px 32px -10px #c0c0c0;
   flex-grow: 3;
+  z-index: 9;
 }
 .events {
   max-width: 500px;

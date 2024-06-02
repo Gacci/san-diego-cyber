@@ -7,9 +7,9 @@
             </select>
         </div>
         <div class="list">
-            <div class="list-item" v-for="(month, index) in months" :key="index" @click="goToMonth(index)">
-                {{ month }}
-            </div>
+            <label class="list-item" v-for="(month, index) in months" :key="index" @click="goToMonth(index)" :for="month">
+                <input class="sr-only" type="radio" name="month" v-model="selectedMonth" :id="month" :value="index">{{ month }}
+            </label>
         </div>
     </div>
   </template>
@@ -21,21 +21,33 @@
     components: {  },
     data() {
       return {
+        selectedMonth: 0,
         selectedYear: new Date().getFullYear(),
         years: Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i), // Generate years from current year to next 10 years
         months: [
-          'January', 'February', 'March', 'April', 'May', 'June', 
-          'July', 'August', 'September', 'October', 'November', 'December'
+          'January', 
+          'February', 
+          'March', 
+          'April', 
+          'May', 
+          'June', 
+          'July', 
+          'August', 
+          'September', 
+          'October', 
+          'November', 
+          'December'
         ]
       };
     },
     methods: {
       onYearChange() {
-        // Optionally handle year change if needed
+        console.log(this.selectedYear, this.selectedMonth, new Date(this.selectedYear, this.selectedMonth, 1))
+        this.$root.$emit('list-date-change', new Date(this.selectedYear, this.selectedMonth, 1));
       },
-      goToMonth() {
-        // const selectedDate = `${this.selectedYear}-${String(monthIndex + 1).padStart(2, '0')}-01`;
-        // this.$refs.calendarComponent.goToMonth(selectedDate);
+      goToMonth(selectedMonth) {
+        console.log(this.selectedYear, selectedMonth, new Date(this.selectedYear, selectedMonth, 1));
+        this.$root.$emit('list-date-change', new Date(this.selectedYear, selectedMonth, 1));
       }
     }
   };
@@ -49,7 +61,7 @@
     height: 60px;
   }
   /* Add any additional styling here if needed */
-  .list {
+  /* .list {
     height: calc(100% - 60px);
     list-style-type: none;
     padding: 0;
@@ -64,8 +76,97 @@
   .list-item:hover {
     cursor: pointer;
     background-color: rgba(255, 255, 255, 0.25);
-  }
+  } */
 
+.sr-only{
+  position: absolute;
+width: 1px;
+height: 1px;
+padding: 0;
+margin: -1px;
+overflow: hidden;
+clip: rect(0, 0, 0, 0);
+white-space: nowrap;
+border-width: 0;
+}
+
+.list {
+  display: flex;
+  height: calc(100% - 60px);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  
+  flex-direction: column;
+  align-items: center;
+}
+
+.list-item {
+  display: flex;
+  width: 100%;
+  height: calc(100% / 12);
+  position: relative;
+  font-size: 1.5rem;
+  align-items: center;
+  padding: 0 32px;
+  color: #fff;
+  cursor: pointer;
+  box-sizing: border-box;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.85));
+  background-clip: text;
+  color: transparent;
+  transition: opacity 0.5s ease;
+  opacity: 1;
+}
+
+.list .list-item:nth-child(1),
+.list .list-item:nth-child(12) {
+  opacity: 0.3;
+}
+
+.list .list-item:nth-child(2),
+.list .list-item:nth-child(11) {
+  opacity: 0.4;
+}
+
+.list .list-item:nth-child(3),
+.list .list-item:nth-child(10) {
+  opacity: 0.5;
+}
+
+.list .list-item:nth-child(4),
+.list .list-item:nth-child(9) {
+  opacity: 0.6;
+}
+
+.list .list-item:nth-child(5),
+.list .list-item:nth-child(8) {
+  opacity: 0.7;
+}
+
+.list .list-item:nth-child(6),
+.list .list-item:nth-child(7) {
+  opacity: 0.8;
+}
+
+.list .list-item:checked,
+.list .list-item:hover {
+  opacity: 1;
+}
+.list .list-item:checked,
+.list .list-item:after{
+  content: '\0020';
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 1;
+}
+.list .list-item input:checked,
+.list .list-item:hover:after {
+  background-color: rgba(255, 255, 255, 0.5);
+}
 
 
 
@@ -84,7 +185,7 @@
   /*  other styles for aesthetics */
   width: 100%;
   font-size: 1.15rem;
-  padding: 0.675em 6em 0.675em 1em;
+  padding: 1em 6em 1em 1em;
   background-color: #fff;
   border: 1px solid #caced1;
   border-radius: 0.25rem;
