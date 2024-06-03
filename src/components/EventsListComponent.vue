@@ -14,7 +14,7 @@
                     <div class="timeline-marker"></div>
                     <div class="timeline-content">
                         <h3>{{ event.start }}</h3>
-                        <p>{{ event.summary }}</p>
+                        <p v-html="event.summary"></p>
                     </div>
                 </div>
             </div>
@@ -43,12 +43,13 @@
     // Watch for changes in the events prop
     events: {
       handler(events) {
-        this.events2 = events.reverse()
+        this.events2 = events
+            .sort((a, b) => b.start?.getTime() - a.start?.getTime())
             .map(event => ({ 
                 ...event, 
                 start: this.toFormatedDate(event.start), 
                 end: this.toFormatedDate(event.end) 
-            }))
+            }));
         // console.log('WATCHING EVENTS',events, this.comingNextEvent, this.lastStagedEvent);
       },
       immediate: true // Call the handler immediately with the current value of events
@@ -62,8 +63,19 @@
           const [ month, dom, year, time ] = datetime.split(' ');
           const [ hours, minutes ] = time.split(':');
 
-          return  month + ' ' + (+dom) + ',' + year + ' ' +
-              (+hours + ':'+ minutes + (+hours < 12 ? 'AM' : 'PM'))
+            let buffer = month;
+                buffer += ' ';
+                buffer += (+dom);
+                buffer += ', ';
+                buffer += year;
+                buffer += ' ';
+                buffer += (+hours <= 12 ? hours : +hours);
+                buffer += ':';
+                buffer += minutes; 
+                buffer += (+hours < 12 ? 'AM' : 'PM');
+
+
+          return  buffer;
     }
   }
 };
@@ -119,6 +131,20 @@
 .timeline-item {
     position: relative;
     padding: 20px 0 20px 40px;
+}
+.timeline-item:after {
+    content: '\0020';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid #06b506;
+    border-radius: 5px;
+    opacity: 0;
+}
+.timeline-item:hover:after {
+    opacity: 1;
 }
 .timeline-marker {
     position: absolute;

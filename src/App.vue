@@ -41,20 +41,22 @@ export default {
       } catch (error) {
         return [];
       }
-    }
+    };
 
     onMounted(async () => {
-      events.value = (await fetchCalendarEvents(
+      
+      const json = (await fetchCalendarEvents(
         '9188d3a61627dc646487e8a9e8a02541f4fca90eebdf0f0bf162bd0a23d45edf@group.calendar.google.com', 
         'AIzaSyD1SAN0kf3Ou-SCDCbsiPEPsj8G4rGWIo0')
-      )
-      .map(event => ({
+      );
+
+
+      const jsDatedEvents = json.map(event => ({
           title: event.summary,
           start: event.start.dateTime || event.start.date,
           end: event.end.dateTime || event.end.date,
-          summary: event.summary,
-          id: event.id,
-          class: 'SOME_CLASS'
+          summary: event.description,
+          id: event.id
       }))
       .map(event => ({
           ...event,
@@ -65,6 +67,29 @@ export default {
             ? new Date(event.end) 
             : event.end
       }));
+
+
+      events.value = Object.values(
+            jsDatedEvents.reduce((accum, event) => {
+                const key = event.start?.getMonth() 
+                    +'.'+ event.start?.getDate();
+
+                if ( accum[key] ) {
+                    accum[key].push(event);
+                }
+                else {
+                    accum[key] = [ event ];
+                }
+
+                return accum;
+            }, {})
+        ).map(events => events.map(event => ({ 
+            ...event, 
+            class: (Math.random()).toString().substring(0, 8)
+        })))
+        .reduce((stack, events) => stack.concat(events), []);
+
+      console.log(events.value)
 
       // console.log(gridViewEvents, listViewEvents);
     });
@@ -103,4 +128,57 @@ html, body, #app {
   max-width: 500px;
   flex-grow: 1;
 }
+</style>
+
+<style>
+/* Background and Text Color Combinations */
+.bg-blue1.text-white1 {
+    background-color: #66aaf3; /* Blue background */
+    color: #ffffff; /* White text */
+  }
+  
+  .bg-yellow1.text-gray2 {
+    background-color: #f0ecbf; /* Yellow background */
+    color: #343a40; /* Dark Gray text */
+  }
+  
+  .bg-green1.text-white1 {
+    background-color: #b1f5b3; /* Green background */
+    color: #ffffff; /* White text */
+  }
+  
+  .bg-red1.text-white1 {
+    background-color: #f9cac7; /* Red background */
+    color: #ffffff; /* White text */
+  }
+  
+  .bg-orange1.text-gray2 {
+    background-color: #f1cb92; /* Orange background */
+    color: #343a40; /* Dark Gray text */
+  }
+  
+  .bg-cyan1.text-white1 {
+    background-color: #bcecf2; /* Cyan background */
+    color: #ffffff; /* White text */
+  }
+  
+  .bg-gray1.text-gray2 {
+    background-color: #f8f9fa; /* Light Gray background */
+    color: #343a40; /* Dark Gray text */
+  }
+  
+  .bg-gray2.text-white1 {
+    background-color: #343a40; /* Dark Gray background */
+    color: #ffffff; /* White text */
+  }
+  
+  .bg-white1.text-gray2 {
+    background-color: #ffffff; /* White background */
+    color: #343a40; /* Dark Gray text */
+  }
+  
+  .bg-gray3.text-white1 {
+    background-color: #6c757d; /* Muted Gray background */
+    color: #ffffff; /* White text */
+  }
 </style>

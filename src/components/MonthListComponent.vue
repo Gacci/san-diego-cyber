@@ -102,13 +102,14 @@ border-width: 0;
 }
 
 .list-item {
-  display: flex;
+  /* display: flex; */
   width: 100%;
   height: calc(100% / 12);
   position: relative;
   font-size: 1.5rem;
   align-items: center;
-  padding: 0 32px;
+  padding: 16px 32px;
+  margin: 0;
   color: #fff;
   cursor: pointer;
   box-sizing: border-box;
@@ -156,11 +157,12 @@ border-width: 0;
 .list .list-item:checked,
 .list .list-item:after{
   content: '\0020';
-  width: 100%;
+  width: calc(100% - 20px);
   height: 100%;
   position: absolute;
   top: 0;
-  left: 0;
+  left: 10px;
+  border-radius: 999px;
   opacity: 1;
 }
 .list .list-item input:checked,
@@ -171,10 +173,6 @@ border-width: 0;
 
 
 
-  .custom-select {
-  min-width: 350px;
-  position: relative;
-}
 
 
 

@@ -46,7 +46,7 @@ export default {
         const getCellClass = (cell, view, events) => {
             console.log('\ncell: ', cell, '\nview: \n', view, '\n:events: \n', events)
 
-            return '';
+            return events.length ? events[0]['class'] : '';
         };
 
         return { getCellClass };
