@@ -9,6 +9,10 @@
 import CalendarComponent from './components/CalendarComponent.vue';
 import EventsListComponent from './components/EventsListComponent.vue';
 import MonthListComponent from './components/MonthListComponent.vue';
+
+import './assets/styles.css';
+
+import DOMPurify from 'dompurify';
 import { ref, onMounted } from 'vue';
 
 
@@ -44,18 +48,30 @@ export default {
     };
 
     onMounted(async () => {
-      
-      const json = (await fetchCalendarEvents(
-        '9188d3a61627dc646487e8a9e8a02541f4fca90eebdf0f0bf162bd0a23d45edf@group.calendar.google.com', 
-        'AIzaSyD1SAN0kf3Ou-SCDCbsiPEPsj8G4rGWIo0')
-      );
+      const colorNameClasses = [
+        'red-001',
+        'orange-001',
+        'yellow-001',
+        'yellow-002',
+        'green-001',
+        'teal-001',
+        'green-002',
+        'gray-001',
+        'blue-001',
+        'blue-002',
+        'blue-003',
+        'purple-001',
+        'purple-002',
+        'pink-001'
+      ];
 
 
+      const json = await fetchCalendarEvents(process.env.VUE_APP_CALENDAR_ID, process.env.VUE_APP_CALENDAR_API_KEY);
       const jsDatedEvents = json.map(event => ({
           title: event.summary,
           start: event.start.dateTime || event.start.date,
           end: event.end.dateTime || event.end.date,
-          summary: event.description,
+          summary: DOMPurify.sanitize(event.description),
           id: event.id
       }))
       .map(event => ({
@@ -83,13 +99,14 @@ export default {
 
                 return accum;
             }, {})
-        ).map(events => events.map(event => ({ 
-            ...event, 
-            class: (Math.random()).toString().substring(0, 8)
-        })))
+        ).map((events, index) => {
+          return events.map(event => ({ 
+            ...event, class: colorNameClasses[index % (colorNameClasses.length + 1)]
+          }))
+        })
         .reduce((stack, events) => stack.concat(events), []);
 
-      console.log(events.value)
+      // console.log('************************', events.value, '************************')
 
       // console.log(gridViewEvents, listViewEvents);
     });

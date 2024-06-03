@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "dompurify": "^3.1.5",
     "googleapis": "^137.1.0",
     "stream-browserify": "^3.0.0",
     "util": "^0.12.5",
     "vue": "^3.4.27",
     "vue-cal": "^4.8.1",
+    "vue3-carousel": "^0.3.3",
     "vuex": "^4.1.0"
   },
   "devDependencies": {

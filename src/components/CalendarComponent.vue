@@ -4,26 +4,23 @@
         <div class="rm2n">
             <!-- class="vuecal--rounded-theme vuecal--rounded-theme vuecal--green-theme" -->
             <vue-cal
-            class=""
-      :small="true"
-      hide-view-selector
-      :time="false"
-      active-view="month"
-      :disable-views="['week']"
-      :events="events"
-      :events-count-on-year-view="true"
-      :cell-class="getCellClass"
-      style="width: 100%;height: 100%"
-      
-                >
-                
-                    
-                    <template #cell-content="{ cell, view, events }">
-                    <div class="vuecal__cell-date" :class="[view.id, getCellClass(cell, view, events)]" v-if="view.id === 'month'">
+            :small="true"
+            hide-view-selector
+            :time="false"
+            active-view="month"
+            :disable-views="['week']"
+            :events="events"
+            :events-count-on-year-view="true"
+            :cell-class="getCellClass"
+            v-model:selected-date="selectedDate" 
+            @update:selected-date="handleCalendarChange"
+            style="width: 100%;height: 100%">  
+                <template #cell-content="{ cell, view, events }">
+                    <div class="vuecal__cell-date" :class="[view.id, getCellClass(cell, view, events)]">
                         {{ cell.content }}
+                        <span class="vuecal__cell--has-events2" :class="[getCellClass(cell, view, events)]" v-if="view.id === 'month'"></span>
                     </div>
                 </template> 
-
             </vue-cal>
         </div>
     </div>
@@ -32,6 +29,15 @@
 <script>
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
+
+import { listViewDate } from './MonthListComponent.vue'
+
+import { ref } from 'vue';
+export const gridViewDate = ref({
+    onChange: function(date) {
+        console.log(date);
+    }
+});
 
 export default {
     components: { VueCal },
@@ -44,13 +50,24 @@ export default {
     setup() {
         // 
         const getCellClass = (cell, view, events) => {
-            console.log('\ncell: ', cell, '\nview: \n', view, '\n:events: \n', events)
-
-            return events.length ? events[0]['class'] : '';
+            // console.log(cell, events);
+            return events.length 
+                ? events[0]['class'] 
+                : '';
         };
 
         return { getCellClass };
     },
+    data() {
+        return {
+            selectedDate: new Date()
+        };
+    },
+    methods: {
+        handleCalendarChange: function() {
+            listViewDate.value.onChange(this.selectedDate);
+        }
+    }
 };
 </script>
   
@@ -95,19 +112,18 @@ export default {
 }
 /* .vuecal__arrow  {
     display: none;
-}
+} */
 .vuecal__title * {
     text-transform: uppercase;
     font-size: x-large;
 }
-.vuecal__title-bar {
+/* .vuecal__title-bar {
     background-color: transparent;
-}
-.vuecal__weekdays-headings{
+} */
+/* .vuecal__weekdays-headings{
     border: none;
-}
-.vuecal__cell--has-events:after {
-    content: '\0020';
+} */
+.vuecal__cell--has-events2 {
     display: block;
     width: 32px;
     height: 32px;
@@ -115,20 +131,20 @@ export default {
     top: 50%;
     left: 50%;
     border-radius: 100%;
-    background-color: #99dcbe;
+    /* background-color: #99dcbe; */
     transform: translate3d(-50%, -50%, 0);
     z-index: -1;
 }
-.vuecal__cell-events-count,
+/* .vuecal__cell-events-count,
 .vuecal__cell::before {
     display: none;
-}
+} */
 .vuecal__menu {
     
 }
-.vuecal__cell--has-events {
+/* .vuecal__cell--has-events {
     background-color: transparent
-}
+} */
 .vuecal__cell--out-of-scope {
     opacity: 0.5;
 }
@@ -137,9 +153,9 @@ export default {
 .vuecal__cell-content {
     color: rgb(120, 117, 117);
 }
-.vuecal__cell--has-events  .vuecal__cell-content {
+/* .vuecal__cell--has-events  .vuecal__cell-content {
     color: #fff;
-} */
+}  */
 /* .vuecal__title-bar {background-color: #e4f5ef;}
 .vuecal__cell--today, .vuecal__cell--current {background-color: rgba(240, 240, 255, 0.4);}
 .vuecal:not(.vuecal--day-view) .vuecal__cell--selected {background-color: rgba(235, 255, 245, 0.4);}

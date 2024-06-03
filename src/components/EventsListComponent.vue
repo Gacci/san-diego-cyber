@@ -11,7 +11,7 @@
             </div>
             <div class="timeline">
                 <div class="timeline-item" v-for="(event, index) in events2" :key="index">
-                    <div class="timeline-marker"></div>
+                    <div class="timeline-marker" :class="[event.class]"></div>
                     <div class="timeline-content">
                         <h3>{{ event.start }}</h3>
                         <p v-html="event.summary"></p>
@@ -142,6 +142,7 @@
     border: 2px solid #06b506;
     border-radius: 5px;
     opacity: 0;
+    z-index: -1;
 }
 .timeline-item:hover:after {
     opacity: 1;
@@ -150,11 +151,11 @@
     position: absolute;
     top: 50%;
     left: 12px;
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    background: #fff;
-    border: 4px solid #007bff;
+    /* background: #fff; */
+    /* border: 4px solid #007bff; */
     transform: translateY(-50%);
 }
 .timeline-content {

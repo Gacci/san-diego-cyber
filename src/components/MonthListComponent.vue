@@ -15,7 +15,13 @@
   </template>
   
   <script>
-
+  import { ref } from 'vue';
+import { gridViewDate } from './CalendarComponent.vue';
+  export const listViewDate = ref({
+      onChange: function(date) {
+        console.log(date);
+      }
+  });
   
   export default {
     components: {  },
@@ -43,11 +49,11 @@
     methods: {
       onYearChange() {
         console.log(this.selectedYear, this.selectedMonth, new Date(this.selectedYear, this.selectedMonth, 1))
-        this.$root.$emit('list-date-change', new Date(this.selectedYear, this.selectedMonth, 1));
+        gridViewDate.value.onChange(new Date(this.selectedYear, this.selectedMonth, 1));
       },
       goToMonth(selectedMonth) {
         console.log(this.selectedYear, selectedMonth, new Date(this.selectedYear, selectedMonth, 1));
-        this.$root.$emit('list-date-change', new Date(this.selectedYear, selectedMonth, 1));
+        gridViewDate.value.onChange(new Date(this.selectedYear, selectedMonth, 1));
       }
     }
   };
