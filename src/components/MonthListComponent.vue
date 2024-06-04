@@ -7,8 +7,8 @@
             </select>
         </div>
         <div class="list">
-            <label class="list-item" v-for="(month, index) in months" :key="index" @click="goToMonth(index)" :for="month">
-                <input class="sr-only" type="radio" name="month" v-model="selectedMonth" :id="month" :value="index">{{ month }}
+            <label class="list-item" v-for="(month, index) in months" :key="index" @change="goToMonth(index)" :for="month">
+                <input class="sr-only" type="radio" name="month" :v-model="selectedMonth" :id="month" :value="index">{{ month }}
             </label>
         </div>
     </div>
@@ -25,10 +25,29 @@ import { gridViewDate } from './CalendarComponent.vue';
   
   export default {
     components: {  },
+    props: {
+    events: {
+        type: Array,
+        required: true
+      }
+    },
+    watch: {
+      events: {
+        handler(newEvents) {
+          this.groups = newEvents ? this.getGroupedEvents(newEvents) : [];
+          console.log('GROUPS: ', this.groups, '\nEVENTS:', newEvents);
+        },
+        immediate: true,
+        deep: true
+      }
+    },
     data() {
+      const now = new Date();
+
       return {
-        selectedMonth: 0,
-        selectedYear: new Date().getFullYear(),
+        groups: [],
+        selectedMonth: now.getMonth(),
+        selectedYear: now.getFullYear(),
         years: Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i), // Generate years from current year to next 10 years
         months: [
           'January', 
@@ -47,12 +66,29 @@ import { gridViewDate } from './CalendarComponent.vue';
       };
     },
     methods: {
+      getGroupedEvents(events) {
+        return Object.values(
+            events?.reduce((accum, event) => {
+                const key = event.start?.getMonth() 
+                    +'.'+ event.start?.getDate();
+
+                if ( accum[key] ) {
+                    accum[key].push(event);
+                }
+                else {
+                    accum[key] = [ event ];
+                }
+
+                return accum;
+            }, {})
+        );
+      },
       onYearChange() {
-        console.log(this.selectedYear, this.selectedMonth, new Date(this.selectedYear, this.selectedMonth, 1))
-        gridViewDate.value.onChange(new Date(this.selectedYear, this.selectedMonth, 1));
+        // console.log(this.selectedYear, this.selectedMonth, new Date(this.selectedYear, this.selectedMonth, 1))
+        // gridViewDate.value.onChange(new Date(this.selectedYear, this.selectedMonth, 1));
       },
       goToMonth(selectedMonth) {
-        console.log(this.selectedYear, selectedMonth, new Date(this.selectedYear, selectedMonth, 1));
+        // console.log(this.selectedYear, selectedMonth, new Date(this.selectedYear, selectedMonth, 1));
         gridViewDate.value.onChange(new Date(this.selectedYear, selectedMonth, 1));
       }
     }

@@ -1,6 +1,6 @@
 <!-- App.vue -->
 <template>
-    <MonthListComponent  class="months"/>
+    <MonthListComponent  class="months" :events="events"/>
     <CalendarComponent class="grid" :events="events"/>
     <EventsListComponent class="events" :events="events"/>
 </template>
@@ -101,7 +101,8 @@ export default {
             }, {})
         ).map((events, index) => {
           return events.map(event => ({ 
-            ...event, class: colorNameClasses[index % (colorNameClasses.length + 1)]
+            ...event, 
+            class: colorNameClasses[index % (colorNameClasses.length + 1)]
           }))
         })
         .reduce((stack, events) => stack.concat(events), []);
