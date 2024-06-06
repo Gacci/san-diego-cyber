@@ -1,54 +1,63 @@
 <!-- YearMonthSelector.vue -->
+<!-- YearMonthSelector.vue -->
 <template>
-    <div class="container">
-        <div class="years">
-            <select class="select" v-model="selectedYear" @change="onYearChange">
-                <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-            </select>
-        </div>
-        <div class="list">
-            <label class="list-item" v-for="(month, index) in months" :key="index" @change="goToMonth(index)" :for="month">
-                <input class="sr-only" type="radio" name="month" :v-model="selectedMonth" :id="month" :value="index">{{ month }}
-            </label>
-        </div>
-    </div>
-  </template>
+  <div class="container">
+      <div class="years">
+          <select class="select" v-model="selectedYear" @change="onYearChange">
+              <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+          </select>
+      </div>
+      <div class="list">
+          <label class="list-item" v-for="(month, index) in months" :key="index" @change="goToMonth" :for="month">
+              <input class="sr-only" type="radio" name="month" v-model="selectedMonth" :id="month" :value="index">
+              <span>{{ month }}</span>
+          </label>
+      </div>
+  </div>
+</template>
   
   <script>
-  import { ref } from 'vue';
-import { gridViewDate } from './CalendarComponent.vue';
-  export const listViewDate = ref({
-      onChange: function(date) {
-        console.log(date);
-      }
-  });
-  
   export default {
     components: {  },
     props: {
-    events: {
+      events: {
         type: Array,
+        required: true
+      },
+      date: {
+        type: Date,
         required: true
       }
     },
     watch: {
       events: {
-        handler(newEvents) {
-          this.groups = newEvents ? this.getGroupedEvents(newEvents) : [];
-          console.log('GROUPS: ', this.groups, '\nEVENTS:', newEvents);
-        },
         immediate: true,
-        deep: true
+        handler(update) {
+          this.groups = this.getGroupedEvents(update ?? []);
+        }
+      },
+      date: {
+        immediate: true,
+        handler(update) {
+          console.log('MonthListComponent: ', update);
+          if ( !(update instanceof Date) ) {
+            return;
+          }
+          
+          this.selectedYear = update.getFullYear();
+          this.selectedMonth = update.getMonth();
+        }
       }
     },
     data() {
       const now = new Date();
+      // const utc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()))
 
       return {
         groups: [],
         selectedMonth: now.getMonth(),
         selectedYear: now.getFullYear(),
-        years: Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i), // Generate years from current year to next 10 years
+        years: Array.from({ length: 25 }, (_, i) => now.getFullYear() + (i - 8)),
         months: [
           'January', 
           'February', 
@@ -66,6 +75,12 @@ import { gridViewDate } from './CalendarComponent.vue';
       };
     },
     methods: {
+      getRangeDates() {
+        return { 
+          startDate: new Date(this.selectedYear, this.selectedMonth, 1),
+          endDate: new Date(this.selectedYear, this.selectedMonth + 1, 0)
+        };
+      },
       getGroupedEvents(events) {
         return Object.values(
             events?.reduce((accum, event) => {
@@ -84,12 +99,12 @@ import { gridViewDate } from './CalendarComponent.vue';
         );
       },
       onYearChange() {
-        // console.log(this.selectedYear, this.selectedMonth, new Date(this.selectedYear, this.selectedMonth, 1))
-        // gridViewDate.value.onChange(new Date(this.selectedYear, this.selectedMonth, 1));
+        console.log('onYearChange', this.getRangeDates());
+        this.$emit('date-change', this.getRangeDates());
       },
-      goToMonth(selectedMonth) {
-        // console.log(this.selectedYear, selectedMonth, new Date(this.selectedYear, selectedMonth, 1));
-        gridViewDate.value.onChange(new Date(this.selectedYear, selectedMonth, 1));
+      goToMonth() {
+        console.log('onMonthChange', this.getRangeDates());
+        this.$emit('date-change', this.getRangeDates());
       }
     }
   };
@@ -144,13 +159,12 @@ border-width: 0;
 }
 
 .list-item {
-  /* display: flex; */
+  display: flex;
   width: 100%;
   height: calc(100% / 12);
   position: relative;
   font-size: 1.5rem;
   align-items: center;
-  padding: 16px 32px;
   margin: 0;
   color: #fff;
   cursor: pointer;
@@ -161,43 +175,47 @@ border-width: 0;
   transition: opacity 0.5s ease;
   opacity: 1;
 }
-
-.list .list-item:nth-child(1),
-.list .list-item:nth-child(12) {
+.list-item span{
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  align-self: stretch;
+  padding: 16px 32px;
+}
+.list .list-item:nth-child(1) span,
+.list .list-item:nth-child(12) span{
   opacity: 0.3;
 }
 
-.list .list-item:nth-child(2),
-.list .list-item:nth-child(11) {
+.list .list-item:nth-child(2) span,
+.list .list-item:nth-child(11) span{
   opacity: 0.4;
 }
 
-.list .list-item:nth-child(3),
-.list .list-item:nth-child(10) {
+.list .list-item:nth-child(3) span,
+.list .list-item:nth-child(10) span{
   opacity: 0.5;
 }
 
-.list .list-item:nth-child(4),
-.list .list-item:nth-child(9) {
+.list .list-item:nth-child(4) span,
+.list .list-item:nth-child(9) span{
   opacity: 0.6;
 }
 
-.list .list-item:nth-child(5),
-.list .list-item:nth-child(8) {
+.list .list-item:nth-child(5) span,
+.list .list-item:nth-child(8) span {
   opacity: 0.7;
 }
 
-.list .list-item:nth-child(6),
-.list .list-item:nth-child(7) {
+.list .list-item:nth-child(6) span,
+.list .list-item:nth-child(7) span {
   opacity: 0.8;
 }
 
-.list .list-item:checked,
-.list .list-item:hover {
+.list .list-item:hover span{
   opacity: 1;
 }
-.list .list-item:checked,
-.list .list-item:after{
+.list .list-item span:after{
   content: '\0020';
   width: calc(100% - 20px);
   height: 100%;
@@ -205,12 +223,20 @@ border-width: 0;
   top: 0;
   left: 10px;
   border-radius: 999px;
+  background-color: #fff;
+  opacity: 0;
+}
+
+.list .list-item input:checked + span{
   opacity: 1;
 }
-.list .list-item input:checked,
-.list .list-item:hover:after {
-  background-color: rgba(255, 255, 255, 0.5);
+.list .list-item input:checked + span:after{
+  opacity: 0.35;
 }
+/* .list .list-item input:checked + span,
+.list .list-item:hover + span:after {
+  background-color: rgba(255, 255, 255, 0.5);
+} */
 
 
 
@@ -227,8 +253,9 @@ border-width: 0;
   font-size: 1.15rem;
   padding: 1em 6em 1em 1em;
   background-color: #fff;
-  border: 1px solid #caced1;
-  border-radius: 0.25rem;
+  /* border: 1px solid #caced1; */
+  border: none;
+  /* border-radius: 0.25rem; */
   color: #000;
   cursor: pointer;
 }

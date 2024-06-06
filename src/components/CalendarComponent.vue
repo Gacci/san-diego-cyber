@@ -1,19 +1,21 @@
 <!-- CalendarComponent.vue -->
 <template>
+    <!-- @update:selected-date="onDateSelect" -->
     <div class="container">
         <div class="rm2n">
             <!-- class="vuecal--rounded-theme vuecal--rounded-theme vuecal--green-theme" -->
             <vue-cal
-            :small="true"
+
             hide-view-selector
-            :time="false"
             active-view="month"
+            :small="true"
+            :time="false"
             :disable-views="['week']"
             :events="events"
             :events-count-on-year-view="true"
+            :selected-date="date"
             :cell-class="getCellClass"
-            v-model:selected-date="selectedDate" 
-            @update:selected-date="handleCalendarChange"
+            @view-change="onViewChange"
             style="width: 100%;height: 100%">  
                 <template #cell-content="{ cell, view, events }">
                     <div class="vuecal__cell-date" :class="[view.id, getCellClass(cell, view, events)]">
@@ -30,14 +32,6 @@
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
 
-import { listViewDate } from './MonthListComponent.vue'
-
-import { ref } from 'vue';
-export const gridViewDate = ref({
-    onChange: function(date) {
-        console.log(date);
-    }
-});
 
 export default {
     components: { VueCal },
@@ -45,27 +39,31 @@ export default {
         events: {
             type: Array,
             required: true
+        },
+        date: {
+            type: Date,
+            required: true
         }
     },
     setup() {
-        // 
         const getCellClass = (cell, view, events) => {
-            // console.log(cell, events);
-            return events.length 
-                ? events[0]['class'] 
-                : '';
+            return (view.id === 'month' && events.length)
+                && (events[0]['class'] ?? '');
         };
 
+    
         return { getCellClass };
     },
     data() {
         return {
-            selectedDate: new Date()
+            selectedDate: new Date(1970, 0, 1)
         };
     },
     methods: {
-        handleCalendarChange: function() {
-            listViewDate.value.onChange(this.selectedDate);
+        onViewChange(view) {
+            // if ( (view.endDate.getTime() - view.startDate.getTime()) <= ( 365 * 24 * 60 * 60 * 1000 ) ) {
+            this.$emit('view-change', { startDate: view.startDate, endDate: view.endDate });
+            // }
         }
     }
 };

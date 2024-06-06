@@ -1,8 +1,18 @@
 <!-- App.vue -->
 <template>
-    <MonthListComponent  class="months" :events="events"/>
-    <CalendarComponent class="grid" :events="events"/>
-    <EventsListComponent class="events" :events="events"/>
+    <MonthListComponent  
+      class="months" 
+      :events="events"  
+      :date="lDate"
+      @date-change="onListChange"/>
+    <CalendarComponent 
+      class="grid" 
+      :events="events" 
+      :date="gDate"
+      @view-change="onGridChange"/>
+    <EventsListComponent 
+      class="events" 
+      :events="events"/>
 </template>
 
 <script>
@@ -16,10 +26,6 @@ import DOMPurify from 'dompurify';
 import { ref, onMounted } from 'vue';
 
 
-/*
-
-*/
-
 export default {
   name: 'App',
   components: {
@@ -28,27 +34,13 @@ export default {
     EventsListComponent
   },
   setup() {
-    // const gridViewEvents = ref([]);
-    // const listViewEvents = ref([]);
+    const now = new Date();
+    const ts = Date.UTC(now.getFullYear(), 1 + now.getMonth(), 1);
+
     const events = ref([]);
-    const fetchCalendarEvents = async function(calendarId, apiKey) {
-      const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}`;
-    
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Failed to fetch events');
-        }
-
-        const data = await response.json();
-        return data.items;
-      } catch (error) {
-        return [];
-      }
-    };
-
-    onMounted(async () => {
-      const colorNameClasses = [
+    const lDate = ref(new Date(ts));
+    const gDate = ref(new Date(ts));
+    const CSS_COLOR_CLASS = [
         'red-001',
         'orange-001',
         'yellow-001',
@@ -65,9 +57,16 @@ export default {
         'pink-001'
       ];
 
+    const isSameDate = function(date1, date2) {
+      console.log('COMPARING: ', date1, date2);
+      return (date1 instanceof Date) 
+        && (date2 instanceof Date) 
+        && date1?.getMonth() === date2?.getMonth() 
+        && date1?.getYear() === date2?.getYear();
+    };
 
-      const json = await fetchCalendarEvents(process.env.VUE_APP_CALENDAR_ID, process.env.VUE_APP_CALENDAR_API_KEY);
-      const jsDatedEvents = json.map(event => ({
+    const transformEventsDates = (collection) => {
+      return collection.map(event => ({
           title: event.summary,
           start: event.start.dateTime || event.start.date,
           end: event.end.dateTime || event.end.date,
@@ -82,37 +81,99 @@ export default {
           end: Date.parse(event.end) 
             ? new Date(event.end) 
             : event.end
-      }));
+      }))
+    };
+
+    const groupedByMonthYear = (collection) => {
+      return collection.reduce((accum, event) => {
+          const key = event.start?.getMonth() 
+              +'.'+ event.start?.getDate();
+
+          if ( accum[key] ) {
+              accum[key].push(event);
+          }
+          else {
+              accum[key] = [ event ];
+          }
+
+          return accum;
+      }, {});
+    };
+
+    const fetchCalendarEvents = async function(timeMin, timeMax) {
+      console.log(timeMin +'  '+timeMax);
+      const key = timeMin +'  '+timeMax;
+      const cache = JSON.parse(localStorage.getItem('__cssd') ?? '{}');
+      if ( cache[key] ) {
+        // return cache[key];
+      }
 
 
-      events.value = Object.values(
-            jsDatedEvents.reduce((accum, event) => {
-                const key = event.start?.getMonth() 
-                    +'.'+ event.start?.getDate();
+      const url = `https://www.googleapis.com/calendar/v3/calendars/${process.env.VUE_APP_CALENDAR_ID}/events?singleEvents=true&orderBy=startTime&key=${process.env.VUE_APP_CALENDAR_API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
 
-                if ( accum[key] ) {
-                    accum[key].push(event);
-                }
-                else {
-                    accum[key] = [ event ];
-                }
+        const { items = [] } = await response?.json();
+        if ( items ) {
+          // localStorage.setItem('__cssd', 
+            // JSON.stringify({ ...cache, [key]: items }));
+        }
 
-                return accum;
-            }, {})
-        ).map((events, index) => {
+        return items;
+      } catch (error) {
+        return [];
+      }
+    };
+
+
+    const onGridChange = async (dates) => {
+      if ( !isSameDate(lDate.value, dates.startDate) ) {
+        console.log('onGridChange', dates);
+        lDate.value = dates.startDate;
+        events.value = await getEventsFor(
+          dates.startDate.toISOString(), dates.endDate.toISOString()
+        );
+      }
+    };
+
+    const onListChange = async (dates) => {
+      if ( !isSameDate(gDate.value, dates.startDate) ) {
+        console.log('onListChange', dates);
+        gDate.value = dates.startDate;
+        events.value = await getEventsFor(
+          dates.startDate.toISOString(), dates.endDate.toISOString()
+        );
+      }
+    };
+
+
+    const getEventsFor = async (start, end) => {
+      const jsDatedEvents = transformEventsDates(
+        await fetchCalendarEvents(start, end)
+      );
+
+      return Object.values(groupedByMonthYear(jsDatedEvents ?? []))
+        .map((events, index) => {
           return events.map(event => ({ 
             ...event, 
-            class: colorNameClasses[index % (colorNameClasses.length + 1)]
+            class: CSS_COLOR_CLASS[index % (CSS_COLOR_CLASS.length + 1)]
           }))
         })
         .reduce((stack, events) => stack.concat(events), []);
+    };
 
-      // console.log('************************', events.value, '************************')
-
-      // console.log(gridViewEvents, listViewEvents);
+    onMounted(async() => {
+      const a = '2024-06-01T00:00:00.000Z';
+      const b = '2024-06-30T23:59:59.999Z'
+      events.value = await getEventsFor(a, b);
     });
 
-    return { events };
+// 
+
+    return { events, lDate, gDate, onGridChange, onListChange };
   }
 };
 </script>

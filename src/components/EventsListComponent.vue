@@ -1,7 +1,7 @@
 
 <template>
-    <div class="container">
-  
+    <div>
+        <div class="container" v-if="events2?.length">
             <div class="header">
                 <div>
                     <h5 class="subtitle past">PAST</h5>
@@ -18,19 +18,32 @@
                     </div>
                 </div>
             </div>
-   
+        </div>
+        <div class="container" v-if="!events2?.length">
+            <div class="header">
+                <div>
+                    <h5 class="subtitle past">PAST</h5>
+                    <h5 class="subtitle future">FUTURE</h5>
+                </div>
+                <h1 class="title">EVENTS</h1>
+            </div>
+        </div>
     </div>
 </template>
 
   
 <script>  
  export default {
-  components: {},
+  components: { },
   props: {
     events: {
       type: Array,
       required: true
-    }
+    },
+    // loading: {
+    //     type: Boolean,
+    //     required: true
+    // }
   },
   data() {
     return {
@@ -42,17 +55,19 @@
   watch: {
     // Watch for changes in the events prop
     events: {
+    immediate: true ,
       handler(events) {
+        this.comingNextEvent = events
+            .find(event => event.start.getTime() > Date.now())
+
         this.events2 = events
-            .sort((a, b) => b.start?.getTime() - a.start?.getTime())
+            .sort((a, b) => a.start?.getTime() - b.start?.getTime())
             .map(event => ({ 
                 ...event, 
                 start: this.toFormatedDate(event.start), 
                 end: this.toFormatedDate(event.end) 
             }));
-        // console.log('WATCHING EVENTS',events, this.comingNextEvent, this.lastStagedEvent);
-      },
-      immediate: true // Call the handler immediately with the current value of events
+      }
     }
   },
   methods: {
@@ -85,8 +100,9 @@
 <style scoped>
 .container {
     max-width: 500px;
+    height: 100%;
     flex-grow: 1;
-    overflow: scroll;
+    overflow-y: scroll;
 }
 .header {
     /* position: sticky;
@@ -139,7 +155,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    border: 2px solid #06b506;
+    border: #36454f;
     border-radius: 5px;
     opacity: 0;
     z-index: -1;
