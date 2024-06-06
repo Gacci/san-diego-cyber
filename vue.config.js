@@ -11,7 +11,7 @@ module.exports = {
   publicPath: '/san-diego-cyber/',
 
   // Specify the output directory for the build
-  outputDir: 'dist',
+  outputDir: 'docs',
 
   configureWebpack: {
     plugins: [
