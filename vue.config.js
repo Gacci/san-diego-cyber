@@ -11,7 +11,7 @@ module.exports = {
   publicPath: '/',
 
   // Specify the output directory for the build
-  // outputDir: 'docs',
+  outputDir: 'docs',
 
   configureWebpack: {
     plugins: [
