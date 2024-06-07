@@ -8,7 +8,7 @@ const webpack = require('webpack');
 
 module.exports = {
   // Set the base URL for the application
-  publicPath: '/JavaScriptJunkie/',
+  publicPath: '/san-diego-cyber/',
 
   // Specify the output directory for the build
   outputDir: 'docs',
