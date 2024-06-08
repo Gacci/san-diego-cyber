@@ -20,6 +20,7 @@ import CalendarComponent from './components/CalendarComponent.vue';
 import EventsListComponent from './components/EventsListComponent.vue';
 import MonthListComponent from './components/MonthListComponent.vue';
 
+import utils from './utils/functions.js'
 import './assets/styles.css';
 
 import DOMPurify from 'dompurify';
@@ -44,17 +45,17 @@ export default {
         'red-001',
         'orange-001',
         'yellow-001',
-        'yellow-002',
         'green-001',
         'teal-001',
         'green-002',
         'gray-001',
         'blue-001',
+        'yellow-002',
         'blue-002',
-        'blue-003',
         'purple-001',
         'purple-002',
-        'pink-001'
+        'pink-001',
+        'blue-003'
       ];
 
     const isSameDate = function(date1, date2) {
@@ -82,22 +83,6 @@ export default {
             ? new Date(event.end) 
             : event.end
       }))
-    };
-
-    const groupedByMonthYear = (collection) => {
-      return collection.reduce((accum, event) => {
-          const key = event.start?.getMonth() 
-              +'.'+ event.start?.getDate();
-
-          if ( accum[key] ) {
-              accum[key].push(event);
-          }
-          else {
-              accum[key] = [ event ];
-          }
-
-          return accum;
-      }, {});
     };
 
     const fetchCalendarEvents = async function(timeMin, timeMax) {
@@ -155,14 +140,18 @@ export default {
         await fetchCalendarEvents(start, end)
       );
 
-      return Object.values(groupedByMonthYear(jsDatedEvents ?? []))
+      console.log('UTILS: ', utils.groupedByMonthYear(jsDatedEvents));
+
+      const groups = Object.values(utils.groupedByMonthYear(jsDatedEvents ?? []))
         .map((events, index) => {
           return events.map(event => ({ 
             ...event, 
             class: CSS_COLOR_CLASS[index % (CSS_COLOR_CLASS.length + 1)]
           }))
-        })
-        .reduce((stack, events) => stack.concat(events), []);
+        });
+        // .reduce((stack, events) => stack.concat(events), []);
+        // console.log('GROUPS: ', groups);
+        return groups;
     };
 
     onMounted(async() => {
@@ -191,12 +180,33 @@ html, body, #app {
   height: 100%;
   margin: 0;
 }
+
+@media screen and (max-width:768px){
+  .months {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99;
+  }
+}
+@media screen and (max-width:1280px){
+  .grid {
+    display: none;
+  }
+}
+@media screen and (min-width:769px) {
+  .months {
+    max-width: 240px;
+    /* box-shadow: 0 0 16px 6px #b0b0b0; */
+  }
+}
+
 #app {
   display: flex;
 }
-.months {
-  min-width: 240px
-}
+
 .grid{
   padding: 60px 32px;
   box-shadow: 16px 0px 32px -10px #c0c0c0;

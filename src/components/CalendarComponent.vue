@@ -11,7 +11,7 @@
             :small="true"
             :time="false"
             :disable-views="['week']"
-            :events="events"
+            :events="collection"
             :events-count-on-year-view="true"
             :selected-date="date"
             :cell-class="getCellClass"
@@ -52,12 +52,35 @@ export default {
         };
 
     
-        return { getCellClass };
+        return { 
+            getCellClass
+        };
     },
     data() {
         return {
-            selectedDate: new Date(1970, 0, 1)
+            selectedDate: new Date(1970, 0, 1),
+            collection: []
         };
+    },
+    watch: {
+        // Watch for changes in the events prop
+        events: {
+            immediate: true ,
+            handler(update) {
+                // this.comingNextEvent = events
+                //     .find(event => event.start.getTime() > Date.now())
+
+                this.collection = update.flatMap(event => event)
+                    .sort((a, b) => a.start?.getTime() - b.start?.getTime())
+                    // .map(event => ({ 
+                    //     ...event, 
+                    //     start: this.toFormatedDate(event.start), 
+                    //     end: this.toFormatedDate(event.end) 
+                    // }));
+
+                console.log('CalendarComponent: ', this.collection, update);
+            }
+        }
     },
     methods: {
         onViewChange(view) {

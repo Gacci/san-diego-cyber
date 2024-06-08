@@ -1,7 +1,7 @@
 
 <template>
     <div>
-        <div class="container" v-if="events2?.length">
+        <div class="container" v-if="collection?.length">
             <div class="header">
                 <div>
                     <h5 class="subtitle past">PAST</h5>
@@ -10,7 +10,7 @@
                 <h1 class="title">EVENTS</h1>
             </div>
             <div class="timeline">
-                <div class="timeline-item" v-for="(event, index) in events2" :key="index">
+                <div class="timeline-item" v-for="(event, index) in collection" :key="index">
                     <div class="timeline-marker" :class="[event.class]"></div>
                     <div class="timeline-content">
                         <h3>{{ event.start }}</h3>
@@ -19,7 +19,7 @@
                 </div>
             </div>
         </div>
-        <div class="container" v-if="!events2?.length">
+        <div class="container" v-if="!collection?.length">
             <div class="header">
                 <div>
                     <h5 class="subtitle past">PAST</h5>
@@ -45,28 +45,23 @@
     //     required: true
     // }
   },
-  data() {
-    return {
-      comingNextEvent: null,
-      lastStagedEvent: null,
-      events2: []
-    };
-  },
   watch: {
     // Watch for changes in the events prop
     events: {
     immediate: true ,
-      handler(events) {
-        this.comingNextEvent = events
-            .find(event => event.start.getTime() > Date.now())
+      handler(update) {
+        // this.comingNextEvent = events
+        //     .find(event => event.start.getTime() > Date.now())
 
-        this.events2 = events
+        this.collection = update.flatMap(event => event)
             .sort((a, b) => a.start?.getTime() - b.start?.getTime())
             .map(event => ({ 
                 ...event, 
                 start: this.toFormatedDate(event.start), 
                 end: this.toFormatedDate(event.end) 
             }));
+
+            console.log('EventsListComponent: ', this.collection,  update);
       }
     }
   },
@@ -92,6 +87,13 @@
 
           return  buffer;
     }
+  },
+  data() {
+    return {
+      comingNextEvent: null,
+      lastStagedEvent: null,
+      collection: []
+    };
   }
 };
 

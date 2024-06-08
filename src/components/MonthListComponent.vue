@@ -2,13 +2,25 @@
 <!-- YearMonthSelector.vue -->
 <template>
   <div class="container">
-      <div class="years">
+      <carousel class="years" 
+        :items-to-show="1">
+          <slide v-for="year in years" :key="year">
+            <span class="year">{{ year }}</span>
+          </slide>
+
+          <template #addons>
+              <navigation />
+              <!-- <pagination /> -->
+          </template>
+      </carousel>
+
+      <!-- <div class="years">
           <select class="select" v-model="selectedYear" @change="onYearChange">
               <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
           </select>
-      </div>
+      </div> -->
       <div class="list">
-          <label class="list-item" v-for="(month, index) in months" :key="index" @change="goToMonth" :for="month">
+          <label class="list-item" v-for="(month, index) in months" :key="index" :for="month" @change="goToMonth">
               <input class="sr-only" type="radio" name="month" v-model="selectedMonth" :id="month" :value="index">
               <span>{{ month }}</span>
           </label>
@@ -17,11 +29,15 @@
 </template>
   
   <script>
+  // import utils from '../utils/functions';
+  import 'vue3-carousel/dist/carousel.css'
+  import { Carousel, Slide, Navigation } from 'vue3-carousel'
+
   export default {
-    components: {  },
+    components: { Carousel, Slide, Navigation },
     props: {
       events: {
-        type: Array,
+        type: Object,
         required: true
       },
       date: {
@@ -33,13 +49,13 @@
       events: {
         immediate: true,
         handler(update) {
-          this.groups = this.getGroupedEvents(update ?? []);
+          console.log('MonthListComponent: ', update);
+          this.collection = update.reduce((stack, events) => stack.concat(events), []);
         }
       },
       date: {
         immediate: true,
         handler(update) {
-          console.log('MonthListComponent: ', update);
           if ( !(update instanceof Date) ) {
             return;
           }
@@ -54,7 +70,7 @@
       // const utc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()))
 
       return {
-        groups: [],
+        collection: [],
         selectedMonth: now.getMonth(),
         selectedYear: now.getFullYear(),
         years: Array.from({ length: 25 }, (_, i) => now.getFullYear() + (i - 8)),
@@ -81,23 +97,6 @@
           endDate: new Date(this.selectedYear, this.selectedMonth + 1, 0)
         };
       },
-      getGroupedEvents(events) {
-        return Object.values(
-            events?.reduce((accum, event) => {
-                const key = event.start?.getMonth() 
-                    +'.'+ event.start?.getDate();
-
-                if ( accum[key] ) {
-                    accum[key].push(event);
-                }
-                else {
-                    accum[key] = [ event ];
-                }
-
-                return accum;
-            }, {})
-        );
-      },
       onYearChange() {
         console.log('onYearChange', this.getRangeDates());
         this.$emit('date-change', this.getRangeDates());
@@ -116,6 +115,10 @@
   }
   .years {
     height: 60px;
+    background: #fff;
+  }
+  .year {
+    font-size: 1.5rem;
   }
   /* Add any additional styling here if needed */
   /* .list {
