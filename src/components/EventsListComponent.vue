@@ -53,7 +53,7 @@
         // this.comingNextEvent = events
         //     .find(event => event.start.getTime() > Date.now())
 
-        this.collection = update.flatMap(event => event)
+        this.collection = update
             .sort((a, b) => a.start?.getTime() - b.start?.getTime())
             .map(event => ({ 
                 ...event, 
@@ -61,7 +61,7 @@
                 end: this.toFormatedDate(event.end) 
             }));
 
-            console.log('EventsListComponent: ', this.collection,  update);
+            // console.log('EventsListComponent: ', this.collection,  update);
       }
     }
   },
@@ -101,7 +101,7 @@
   
 <style scoped>
 .container {
-    max-width: 500px;
+    /* max-width: 500px; */
     height: 100%;
     flex-grow: 1;
     overflow-y: scroll;

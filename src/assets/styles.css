@@ -1,73 +1,60 @@
 /* import '~/vue-final-modal/style.css' */
 
+* {
+  font: 15px Avenir,Helvetica,Arial,sans-serif;
+    font-size: 15px;
+  -moz-osx-font-smoothing: grayscale;
+  /* color: #2c3e50; */
+}
+html, body, #app {
+  width:100%;
+  height: 100%;
+  margin: 0;
+}
 
-.red-001 {
-    background: rgb(248, 113, 113);
-    color: #fff;
-  }
-  
-  .orange-001 {
-    background: rgb(253, 186, 116);
-    color: #fff;
-  }
-  
-  .yellow-001 {
-    background: rgb(253, 230, 138);
-    color: #fff;
-  }
-  
-  .yellow-002 {
-    background: rgb(253, 224, 71);
-    color: #fff;
-  }
-  
-  .green-001 {
-    background: rgb(190, 242, 100);
-    color: #fff;
-  }
-  
-  .teal-001 {
-    background: rgb(114, 169, 172);
-    color: #fff;
-  }
-  
-  .green-002 {
-    background: rgb(110, 231, 183);
-    color: #fff;
-  }
-  
-  .gray-001 {
-    background: rgb(125, 115, 125);
-    color: #fff;
-  }
-  
-  .blue-001 {
-    background: rgb(103, 232, 249);
-    color: #fff;
-  }
-  
-  .blue-002 {
-    background: rgb(96, 165, 250);
-    color: #fff;
-  }
-  
-  .blue-003 {
-    background: rgb(99, 102, 241);
-    color: #fff;
-  }
-  
-  .purple-001 {
-    background: rgb(167, 139, 250);
-    color: #fff;
-  }
-  
-  .purple-002 {
-    background: rgb(232, 121, 249);
-    color: #fff;
-  }
-  
-  .pink-001 {
-    background: rgb(244, 114, 182);
-    color: #fff;
-  }
-  
+.bg-blue-100 {
+  background-color: rgb(116, 150, 253);
+  color: #fff;
+}
+.bg-indigo-100 {
+  background: rgb(213, 20, 158);
+  color: #fff;
+}
+.bg-teal-100 {
+  background-color: rgb(115, 170, 162);
+  color: #fff;
+}
+
+
+.bg-green-300{
+  background-color: rgb(23, 186, 116);
+  color: #fff;
+}
+
+
+.bg-brown-600 {
+  background-color: rgb(186, 99, 23);
+  color: #fff;;
+}
+.bg-yellow-600 {
+  background-color: rgb(238, 195, 26);
+  color: #fff;
+}
+
+
+.bg-green-700{
+  background-color: rgb(8, 63, 73);
+  color: #fff;
+}
+.bg-brown-700 {
+  background-color: rgb(213, 101, 20);
+  color: #fff;;
+}
+.bg-pink-700 {
+  background: rgb(234, 46, 231);
+  color: #fff;
+}
+.bg-orange-700 {
+  background-color: rgb(255, 130, 20);
+  color: #fff;
+}

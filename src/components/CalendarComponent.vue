@@ -5,12 +5,12 @@
         <div class="rm2n">
             <!-- class="vuecal--rounded-theme vuecal--rounded-theme vuecal--green-theme" -->
             <vue-cal
-
             hide-view-selector
             active-view="month"
+            active-vew="'week'"
+            disable-views="['years', 'year', 'week', 'day']"
             :small="true"
             :time="false"
-            :disable-views="['week']"
             :events="collection"
             :events-count-on-year-view="true"
             :selected-date="date"
@@ -20,7 +20,7 @@
                 <template #cell-content="{ cell, view, events }">
                     <div class="vuecal__cell-date" :class="[view.id, getCellClass(cell, view, events)]">
                         {{ cell.content }}
-                        <span class="vuecal__cell--has-events2" :class="[getCellClass(cell, view, events)]" v-if="view.id === 'month'"></span>
+                        <!-- <span class="vuecal__cell--has-events2" :class="[getCellClass(cell, view, events)]" v-if="view.id === 'month'"></span> -->
                     </div>
                 </template> 
             </vue-cal>
@@ -47,11 +47,10 @@ export default {
     },
     setup() {
         const getCellClass = (cell, view, events) => {
-            return (view.id === 'month' && events.length)
+            return (!cell.outOfScope && events.length)
                 && (events[0]['class'] ?? '');
         };
 
-    
         return { 
             getCellClass
         };
@@ -70,15 +69,14 @@ export default {
                 // this.comingNextEvent = events
                 //     .find(event => event.start.getTime() > Date.now())
 
-                this.collection = update.flatMap(event => event)
-                    .sort((a, b) => a.start?.getTime() - b.start?.getTime())
+                this.collection = update.sort((a, b) => a.start?.getTime() - b.start?.getTime())
                     // .map(event => ({ 
                     //     ...event, 
                     //     start: this.toFormatedDate(event.start), 
                     //     end: this.toFormatedDate(event.end) 
                     // }));
 
-                console.log('CalendarComponent: ', this.collection, update);
+                // console.log('CalendarComponent: ', this.collection, update);
             }
         }
     },
@@ -128,22 +126,18 @@ export default {
     height: 100%;
 }
 .vuecal__title-bar{
-    background-color: rgba(244, 211, 102, 0.73);
-    border-radius: 999px;
+    background-color: transparent;
 }
-/* .vuecal__arrow  {
-    display: none;
-} */
 .vuecal__title * {
     text-transform: uppercase;
     font-size: x-large;
 }
-/* .vuecal__title-bar {
-    background-color: transparent;
-} */
-/* .vuecal__weekdays-headings{
+.vuecal__arrow{
+    display: none;
+}
+.vuecal__cell::before{
     border: none;
-} */
+}
 .vuecal__cell--has-events2 {
     display: block;
     width: 32px;
@@ -152,39 +146,26 @@ export default {
     top: 50%;
     left: 50%;
     border-radius: 100%;
-    /* background-color: #99dcbe; */
     transform: translate3d(-50%, -50%, 0);
     z-index: -1;
 }
-/* .vuecal__cell-events-count,
-.vuecal__cell::before {
-    display: none;
-} */
-.vuecal__menu {
-    
-}
-/* .vuecal__cell--has-events {
-    background-color: transparent
-} */
 .vuecal__cell--out-of-scope {
-    opacity: 0.5;
+    opacity: 0.35;
+}
+.vuecal__cell-date {
+    width: 48px;
+    height: 48px;
+    align-self: center;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
 }
 .vuecal__title-bar *,
 .vuecal__weekdays-headings,
 .vuecal__cell-content {
     color: rgb(120, 117, 117);
 }
-/* .vuecal__cell--has-events  .vuecal__cell-content {
-    color: #fff;
-}  */
-/* .vuecal__title-bar {background-color: #e4f5ef;}
-.vuecal__cell--today, .vuecal__cell--current {background-color: rgba(240, 240, 255, 0.4);}
-.vuecal:not(.vuecal--day-view) .vuecal__cell--selected {background-color: rgba(235, 255, 245, 0.4);}
-.vuecal__cell--selected:before {border-color: rgba(66, 185, 131, 0.5);}
-/* Cells and buttons get highlighted when an event is dragged over it. */
-/* .vuecal__cell--highlighted:not(.vuecal__cell--has-splits),
-.vuecal__cell-split--highlighted {background-color: rgba(195, 255, 225, 0.5);}
-.vuecal__arrow.vuecal__arrow--highlighted,
-.vuecal__view-btn.vuecal__view-btn--highlighted {background-color: rgba(136, 236, 191, 0.25);} */ 
   </style>
   

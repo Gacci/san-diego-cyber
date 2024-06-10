@@ -1,15 +1,27 @@
 <!-- App.vue -->
 <template>
+    <header id="app-header">
+      <button class="control" @click="toggleListView">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+        </svg>
+
+        <span>
+
+        </span>
+      </button>
+    </header>
+
     <MonthListComponent  
       class="months" 
+      :class="[!listViewState ? 'off' : '']"
       :events="events"  
-      :date="lDate"
+      :date="date"
       @date-change="onListChange"/>
     <CalendarComponent 
       class="grid" 
       :events="events" 
-      :date="gDate"
-      @view-change="onGridChange"/>
+      :date="date"/>
     <EventsListComponent 
       class="events" 
       :events="events"/>
@@ -39,24 +51,21 @@ export default {
     const ts = Date.UTC(now.getFullYear(), 1 + now.getMonth(), 1);
 
     const events = ref([]);
-    const lDate = ref(new Date(ts));
-    const gDate = ref(new Date(ts));
+    const listViewState = ref(false);
+
+    const date = ref(new Date(ts));
     const CSS_COLOR_CLASS = [
-        'red-001',
-        'orange-001',
-        'yellow-001',
-        'green-001',
-        'teal-001',
-        'green-002',
-        'gray-001',
-        'blue-001',
-        'yellow-002',
-        'blue-002',
-        'purple-001',
-        'purple-002',
-        'pink-001',
-        'blue-003'
-      ];
+      'bg-blue-100',
+      'bg-teal-100',
+      'bg-indigo-100',
+      'bg-green-300',
+      'bg-brown-600',
+      'bg-yellow-600',
+      'bg-green-700',
+      'bg-brown-700',
+      'bg-pink-700',
+      'bg-orange-700'
+    ];
 
     const isSameDate = function(date1, date2) {
       console.log('COMPARING: ', date1, date2);
@@ -86,7 +95,6 @@ export default {
     };
 
     const fetchCalendarEvents = async function(timeMin, timeMax) {
-      console.log(timeMin +'  '+timeMax);
       const key = timeMin +'  '+timeMax;
       const cache = JSON.parse(localStorage.getItem('__cssd') ?? '{}');
       if ( cache[key] ) {
@@ -113,82 +121,106 @@ export default {
       }
     };
 
-
-    const onGridChange = async (dates) => {
-      if ( !isSameDate(lDate.value, dates.startDate) ) {
-        console.log('onGridChange', dates);
-        lDate.value = dates.startDate;
-        events.value = await getEventsFor(
-          dates.startDate.toISOString(), dates.endDate.toISOString()
-        );
-      }
-    };
-
-    const onListChange = async (dates) => {
-      if ( !isSameDate(gDate.value, dates.startDate) ) {
-        console.log('onListChange', dates);
-        gDate.value = dates.startDate;
-        events.value = await getEventsFor(
-          dates.startDate.toISOString(), dates.endDate.toISOString()
-        );
-      }
-    };
-
-
-    const getEventsFor = async (start, end) => {
-      const jsDatedEvents = transformEventsDates(
-        await fetchCalendarEvents(start, end)
-      );
-
-      console.log('UTILS: ', utils.groupedByMonthYear(jsDatedEvents));
-
-      const groups = Object.values(utils.groupedByMonthYear(jsDatedEvents ?? []))
+    const loadCyberEvents = async(start, end) => {
+      const data = await fetchCalendarEvents(start, end)
+      return Object
+        .values(utils.groupByDateMonth(
+          transformEventsDates(data)
+        ))
         .map((events, index) => {
           return events.map(event => ({ 
             ...event, 
-            class: CSS_COLOR_CLASS[index % (CSS_COLOR_CLASS.length + 1)]
+            class: CSS_COLOR_CLASS[
+              index % CSS_COLOR_CLASS.length
+            ]
           }))
-        });
-        // .reduce((stack, events) => stack.concat(events), []);
-        // console.log('GROUPS: ', groups);
-        return groups;
+        })
+        .flatMap(event => event);
     };
 
+    const onListChange = async (dates) => {
+      if ( !isSameDate(date.value, dates.startDate) ) {
+        console.log('onListChange', dates);
+        date.value = dates.startDate;
+        // events.value = Object.values(await getEventsFor(
+        //   dates.startDate.toISOString(), dates.endDate.toISOString()
+        // ));
+      }
+    };
+
+    const toggleListView = () => {
+      listViewState.value = !listViewState.value;
+    }
+
     onMounted(async() => {
-      const a = '2024-06-01T00:00:00.000Z';
-      const b = '2024-06-30T23:59:59.999Z'
-      events.value = await getEventsFor(a, b);
+      events.value = await loadCyberEvents('2024-01-01T00:00:00.000Z', '2024-12-31T23:59:59.999Z');
     });
 
 // 
 
-    return { events, lDate, gDate, onGridChange, onListChange };
+    return { events, date, listViewState, toggleListView, onListChange };
   }
 };
 </script>
 
 <style>
 /* Add any additional styling here if needed */
-* {
-  font: 15px Avenir,Helvetica,Arial,sans-serif;
-    font-size: 15px;
-  -moz-osx-font-smoothing: grayscale;
-  /* color: #2c3e50; */
-}
-html, body, #app {
-  width:100%;
-  height: 100%;
-  margin: 0;
-}
-
 @media screen and (max-width:768px){
+  #app {
+    overflow: hidden;
+  }
   .months {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    transition: transform 0.25s ease-in-out;
+
+    padding-top: 60px;
+    box-sizing: border-box;
+
+    z-index: 49;
+  }
+  .months.off{
+    transform: translate3d(0%, -100%, 0);
+  }
+  #app-header {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgb(114, 116, 231);
+    border-bottom: 1px solid #fff;
+    align-items: center;
+    justify-content: space-between;
     z-index: 99;
+  }
+  .control {
+    width: 64px;
+    height: 36px;
+    border: none;
+    background-color: #5721eb;
+    border-radius: 999px;
+    padding: 5px 10px;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    z-index: 99;
+  }
+  .control:active {
+    box-shadow: inset 0 0 16px 16px #c795f154;
+  }
+  .control svg {
+    width: 24px;
+    height: 24px;;
+  }
+  .events {
+    height: 100%;
+    padding-top: 60px;
+    box-sizing: border-box;
   }
 }
 @media screen and (max-width:1280px){
@@ -197,14 +229,26 @@ html, body, #app {
   }
 }
 @media screen and (min-width:769px) {
+  #app {
+    display: flex;
+  }
+  .events {
+    flex-grow: 1;
+  }
   .months {
     max-width: 240px;
     /* box-shadow: 0 0 16px 6px #b0b0b0; */
   }
 }
-
-#app {
-  display: flex;
+@media screen and (min-width:768px) {
+  #app-header {
+    display: none;
+  }
+}
+@media screen and (min-width:1280px) {
+  .events {
+    max-width: 500px;
+  }
 }
 
 .grid{
@@ -213,61 +257,4 @@ html, body, #app {
   flex-grow: 3;
   z-index: 9;
 }
-.events {
-  max-width: 500px;
-  flex-grow: 1;
-}
-</style>
-
-<style>
-/* Background and Text Color Combinations */
-.bg-blue1.text-white1 {
-    background-color: #66aaf3; /* Blue background */
-    color: #ffffff; /* White text */
-  }
-  
-  .bg-yellow1.text-gray2 {
-    background-color: #f0ecbf; /* Yellow background */
-    color: #343a40; /* Dark Gray text */
-  }
-  
-  .bg-green1.text-white1 {
-    background-color: #b1f5b3; /* Green background */
-    color: #ffffff; /* White text */
-  }
-  
-  .bg-red1.text-white1 {
-    background-color: #f9cac7; /* Red background */
-    color: #ffffff; /* White text */
-  }
-  
-  .bg-orange1.text-gray2 {
-    background-color: #f1cb92; /* Orange background */
-    color: #343a40; /* Dark Gray text */
-  }
-  
-  .bg-cyan1.text-white1 {
-    background-color: #bcecf2; /* Cyan background */
-    color: #ffffff; /* White text */
-  }
-  
-  .bg-gray1.text-gray2 {
-    background-color: #f8f9fa; /* Light Gray background */
-    color: #343a40; /* Dark Gray text */
-  }
-  
-  .bg-gray2.text-white1 {
-    background-color: #343a40; /* Dark Gray background */
-    color: #ffffff; /* White text */
-  }
-  
-  .bg-white1.text-gray2 {
-    background-color: #ffffff; /* White background */
-    color: #343a40; /* Dark Gray text */
-  }
-  
-  .bg-gray3.text-white1 {
-    background-color: #6c757d; /* Muted Gray background */
-    color: #ffffff; /* White text */
-  }
 </style>
