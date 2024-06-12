@@ -24,7 +24,8 @@
       :date="date"/>
     <EventsListComponent 
       class="events" 
-      :events="events"/>
+      :events="events"
+      :date="date"/>
 </template>
 
 <script>
@@ -68,7 +69,6 @@ export default {
     ];
 
     const isSameDate = function(date1, date2) {
-      console.log('COMPARING: ', date1, date2);
       return (date1 instanceof Date) 
         && (date2 instanceof Date) 
         && date1?.getMonth() === date2?.getMonth() 
@@ -140,11 +140,17 @@ export default {
 
     const onListChange = async (dates) => {
       if ( !isSameDate(date.value, dates.startDate) ) {
-        console.log('onListChange', dates);
         date.value = dates.startDate;
-        // events.value = Object.values(await getEventsFor(
-        //   dates.startDate.toISOString(), dates.endDate.toISOString()
-        // ));
+        if ( window.innerWidth <= 768 ) {
+          toggleListView();
+        }
+
+        events.value = await loadCyberEvents(
+          (new Date(date.value.getFullYear(), 0, 1, 0, 0, 0, 0))
+            .toISOString(), 
+          (new Date(date.value.getFullYear(), 11, 31, 23, 59, 59, 999))
+            .toISOString()
+        );
       }
     };
 

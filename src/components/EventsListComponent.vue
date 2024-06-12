@@ -40,10 +40,10 @@
       type: Array,
       required: true
     },
-    // loading: {
-    //     type: Boolean,
-    //     required: true
-    // }
+    date: {
+        type: Date,
+        required: true
+    }
   },
   watch: {
     // Watch for changes in the events prop
@@ -53,15 +53,22 @@
         // this.comingNextEvent = events
         //     .find(event => event.start.getTime() > Date.now())
 
+        const datetime = this.date ?? new Date();
+
+        const lower = new Date(datetime.getFullYear(), datetime.getMonth(), 1);
+        const upper = new Date(datetime.getFullYear(), datetime.getMonth() + 1, 0);
+
         this.collection = update
             .sort((a, b) => a.start?.getTime() - b.start?.getTime())
+            .filter((object) => 
+                object.start.getTime() >= lower.getTime() &&
+                object.end.getTime() <= upper.getTime()
+            )
             .map(event => ({ 
                 ...event, 
                 start: this.toFormatedDate(event.start), 
                 end: this.toFormatedDate(event.end) 
             }));
-
-            // console.log('EventsListComponent: ', this.collection,  update);
       }
     }
   },

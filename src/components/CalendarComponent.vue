@@ -66,45 +66,19 @@ export default {
         events: {
             immediate: true ,
             handler(update) {
-                // this.comingNextEvent = events
-                //     .find(event => event.start.getTime() > Date.now())
-
                 this.collection = update.sort((a, b) => a.start?.getTime() - b.start?.getTime())
-                    // .map(event => ({ 
-                    //     ...event, 
-                    //     start: this.toFormatedDate(event.start), 
-                    //     end: this.toFormatedDate(event.end) 
-                    // }));
-
-                // console.log('CalendarComponent: ', this.collection, update);
             }
         }
     },
     methods: {
         onViewChange(view) {
-            // if ( (view.endDate.getTime() - view.startDate.getTime()) <= ( 365 * 24 * 60 * 60 * 1000 ) ) {
             this.$emit('view-change', { startDate: view.startDate, endDate: view.endDate });
-            // }
         }
     }
 };
 </script>
   
 <style scoped>
-    /* Add any additional styling here if needed */
-    /* .vuecal__cell--disabled {text-decoration: line-through;}
-    .vuecal__cell--before-min {color: #b6d6c7;}
-    .vuecal__cell--after-max {color: #008b8b;} */
-    /* .vuecal__menu, .vuecal__cell-events-count {background-color: #42b983;}
-    .vuecal__cell-content {
-        color: #8f8f8f;
-    }
-    .vuecal__cell-events-count {
-        width: 18px;
-        height: 2px;
-        color: transparent;
-    } */
-
 .rm2n {
     position: relative;
 }

@@ -105,9 +105,6 @@
           
           this.selectedYearIndex = this.years.indexOf(update.getFullYear());
           this.selectedMonth = update.getMonth();
-
-          // console.log(this.selectedYearIndex);
-          // console.log(this.vueCarouselRef);
         }
       },
       view: {
@@ -152,15 +149,12 @@
         };
       },
       // onYearChange() {
-      //   console.log('onYearChange', this.getRangeDates());
       //   this.$emit('date-change', this.getRangeDates());
       // },
       goToMonth() {
-        console.log('onMonthChange', this.getRangeDates());
         this.$emit('date-change', this.getRangeDates());
       },
       onSlideEnd() {
-        console.log('onYearChange', this.getRangeDates());
         this.$emit('date-change', this.getRangeDates());
       }
     }
