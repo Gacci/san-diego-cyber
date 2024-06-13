@@ -98,7 +98,7 @@ export default {
       const key = timeMin +'  '+timeMax;
       const cache = JSON.parse(localStorage.getItem('__cssd') ?? '{}');
       if ( cache[key] ) {
-        // return cache[key];
+        return cache[key];
       }
 
 
@@ -111,8 +111,8 @@ export default {
 
         const { items = [] } = await response?.json();
         if ( items ) {
-          // localStorage.setItem('__cssd', 
-            // JSON.stringify({ ...cache, [key]: items }));
+          localStorage.setItem('__cssd', 
+            JSON.stringify({ ...cache, [key]: items }));
         }
 
         return items;

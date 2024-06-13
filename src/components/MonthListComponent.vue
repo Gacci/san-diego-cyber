@@ -218,7 +218,7 @@
   box-sizing: border-box;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.85));
   background-clip: text;
-  color: transparent;
+  /* color: transparent; */
   transition: opacity 0.5s ease;
   opacity: 1;
 }
@@ -282,55 +282,6 @@
 }
 .list .list-item input:checked + span:after{
   opacity: 0.35;
-}
-/* .list .list-item input:checked + span,
-.list .list-item:hover + span:after {
-  background-color: rgba(255, 255, 255, 0.5);
-} */
-
-
-
-
-
-
-
-.select {
-  appearance: none;
-  /*  safari  */
-  -webkit-appearance: none;
-  /*  other styles for aesthetics */
-  width: 100%;
-  font-size: 1.15rem;
-  padding: 1em 6em 1em 1em;
-  background-color: #fff;
-  /* border: 1px solid #caced1; */
-  border: none;
-  /* border-radius: 0.25rem; */
-  color: #000;
-  cursor: pointer;
-}
-
-.select::before,
-.select::after {
-  --size: 0.3rem;
-  content: "";
-  position: absolute;
-  right: 1rem;
-  pointer-events: none;
-}
-
-.select::before {
-  border-left: var(--size) solid transparent;
-  border-right: var(--size) solid transparent;
-  border-bottom: var(--size) solid black;
-  top: 40%;
-}
-
-.select::after {
-  border-left: var(--size) solid transparent;
-  border-right: var(--size) solid transparent;
-  border-top: var(--size) solid black;
-  top: 55%;
 }
 </style>
   
