@@ -3,8 +3,7 @@
 //   transpileDependencies: true
 // })
 
-
-const webpack = require('webpack');
+const webpack = require('webpack')
 
 module.exports = {
   // Set the base URL for the application
@@ -16,11 +15,11 @@ module.exports = {
   configureWebpack: {
     plugins: [
       new webpack.DefinePlugin({
-        '__VUE_OPTIONS_API__': JSON.stringify(true),
-        '__VUE_PROD_DEVTOOLS__': JSON.stringify(false),
-        '__VUE_PROD_HYDRATION_MISMATCH_DETAILS__': JSON.stringify(false),
+        __VUE_OPTIONS_API__: JSON.stringify(true),
+        __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false),
         // add other feature flags as needed
-      })
-    ]
-  }
-};
+      }),
+    ],
+  },
+}
