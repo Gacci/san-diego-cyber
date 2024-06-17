@@ -264,7 +264,7 @@ export default {
 
 .grid {
   padding: 60px 32px;
-  box-shadow: 16px 0px 32px -10px #c0c0c0;
+  box-shadow: 16px 0px 32px -10px #000;
   flex-grow: 3;
   z-index: 9;
 }

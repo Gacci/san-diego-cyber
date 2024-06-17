@@ -112,7 +112,11 @@ export default {
   /* max-width: 500px; */
   height: 100%;
   flex-grow: 1;
+  background-color: #36454F;
   overflow-y: scroll;
+}
+.container * {
+    color: #fff;
 }
 .header {
   /* position: sticky;
@@ -120,13 +124,13 @@ export default {
   display: flex;
   align-items: center;
   padding: 16px 32px;
-  background-color: #fff;
   z-index: 1;
 }
 .header .title {
   font-size: 5rem;
   margin: 0;
-  color: #36454f;
+  /* color: #36454f; */
+  color: #fff;
 }
 .header .subtitle {
   text-align: right;
@@ -134,10 +138,10 @@ export default {
   font-size: 1.5rem;
 }
 .header .past {
-  color: #ea2a9f;
+  color: #fff;
 }
 .header .future {
-  color: #06b506;
+  color: #fff;
 }
 .timeline {
   position: relative;
@@ -195,6 +199,6 @@ export default {
 .timeline-content p {
   margin: 0;
   font-size: 0.9em;
-  color: #666;
+  color: #ccc6c6;
 }
 </style>

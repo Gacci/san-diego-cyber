@@ -182,7 +182,7 @@ export default {
 
 <style scoped>
 .container {
-  background-color: rgb(114, 116, 231);
+  background-color: #f05252;
 }
 .years {
   height: 60px;
