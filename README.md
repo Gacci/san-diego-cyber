@@ -1,4 +1,4 @@
-# js-junkie
+# js-junkie (https://gacci.github.io/san-diego-cyber/#/home)
 
 ## Project setup
 ```
